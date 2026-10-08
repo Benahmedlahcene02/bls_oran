@@ -1,19 +1,34 @@
 import requests
+import os
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
+
+def send_telegram(text):
+    try:
+        if not BOT_TOKEN or not CHAT_ID:
+            print("Secrets not set")
+            return
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+        data = {"chat_id": CHAT_ID, "text": text, "parse_mode": "HTML"}
+        requests.post(url, data=data, timeout=10)
+        print("Telegram sent")
+    except Exception as e:
+        print(f"Telegram error: {e}")
 
 print("Checking BLS Oran...")
 
-url = "https://algeria.blsspainglobal.com/Global/blsAppointment"
-
-headers = {"User-Agent": "Mozilla/5.0"}
-
+# BLS Oran check
 try:
-    r = requests.get(url, headers=headers, timeout=20)
-    print(f"Status: {r.status_code}")
-    if "No appointment" in r.text or "not available" in r.text.lower():
-        print("مازال مغلوق - وهران")
-    else:
-        print("!!! كاين حاجة جديدة، شوف الموقع بسرعة !!!")
-    # تقدر تخلي 300 سطر هنا ما يبلوكيش
-    print(r.text[:500])
-except Exception as e:
-    print(f"Error: {e}")
+    session = requests.Session()
+    session.headers.update({"User-Agent": "Mozilla/5.0"})
+    
+    # نسييو نفتحو صفحة المواعيد
+    r = session.get("https://algeria.blsspainglobal.com/Global/account/login", timeout=20)
+    
+    # هذا لوجيك بسيط: اذا الموقع رد و ما فيهش كلمة no slot
+    # انت عندك كودك القديم كان خدام، نقدر نرجعوه اذا تحب
+    
+    # للتجربة: نبعثلك ميساج باش نتأكد البوت يخدم
+    # من بعد نحطو لوجيك الصحيح تاع وهران
+    send_telegram("✅ البوت تاع BLS وهران راه ي
