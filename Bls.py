@@ -1,22 +1,32 @@
-import requests, os
+import requests
+import os
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-def send(msg):
-    if not BOT_TOKEN or not CHAT_ID:
-        print("no secrets")
-        return
+def send_telegram(text):
     try:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-        requests.post(url, data={"chat_id": CHAT_ID, "text": msg}, timeout=10)
-        print("sent")
+        requests.post(url, data={"chat_id": CHAT_ID, "text": text}, timeout=10)
+        print("Telegram sent")
     except Exception as e:
-        print(e)
+        print(f"Telegram error: {e}")
 
-print("Checking...")
+print("Checking BLS Oran...")
 
-# test message
-send("Bot BLS Oran is working! Test OK")
+# هنا لوجيك الفحص
+try:
+    headers = {"User-Agent": "Mozilla/5.0"}
+    r = requests.get("https://algeria.blsspainglobal.com/Global/appointment", headers=headers, timeout=20)
+    
+    # كي يحل، البوت يبعث
+    # بدل الشرط هذا بالفحص الحقيقي تاعك
+    if r.status_code == 200 and "no appointment" not in r.text.lower():
+        send_telegram("🔥 BLS ORAN حل! ادخل هنا: https://algeria.blsspainglobal.com")
+    else:
+        print("No slot")
 
-print("done")
+    send_telegram("✅ Test: Bot Oran is working every 15min")
+
+except Exception as e:
+    print(e)
