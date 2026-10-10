@@ -8,10 +8,7 @@ def send(text):
     try:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
         requests.post(url, data={"chat_id": CHAT_ID, "text": text}, timeout=10)
-    except:
-        pass
-
-print("Checking BLS Oran...")
+    ex
 
 try:
     headers = {"User-Agent": "Mozilla/5.0"}
