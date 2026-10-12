@@ -2,13 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BLS ORAN 24/24 - مراقبة قوية</title>
+<title>BLS ORAN 24/24</title>
 <style>body{font-family:Arial;background:#0a2a4a;color:white;text-align:center;padding:20px}.box{background:white;color:#000;padding:20px;border-radius:15px;max-width:500px;margin:auto}button{width:100%;padding:15px;border:none;border-radius:10px;font-size:17px;font-weight:bold;margin-top:10px;color:white;cursor:pointer}.red{background:#c0392b}.green{background:#1a7a3a}.blue{background:#2980b9}.status{font-weight:bold;background:#eef3f7;padding:12px;border-radius:8px}</style>
 </head>
 <body>
 <div class="box">
 <h2>🇪🇸 BLS ORAN 24/24</h2>
-<p><b>الشلف / وهران - فيزا اسبانيا</b></p>
+<p><b>الشلف / وهران - فيزا اسبانيا - Lahcene</b></p>
 <p style="color:#1a7a3a;font-weight:bold">🟢 مراقبة شغالة 24 ساعة / 24 ساعة</p>
 <p class="status" id="status">⏳ نراقب...</p>
 <p id="log" style="font-size:13px;text-align:right;background:#f9f9f9;padding:10px;border-radius:8px">سجل المراقبة...</p>
@@ -16,34 +16,27 @@
 <button class="red" onclick="testNow()">🔔 جرب الاشعار ذرك</button>
 <button class="blue" onclick="checkNow()">🔍 تفقد المواعيد ذرك</button>
 <a href="https://algeria.blsspainvisa.com/oran/" target="_blank"><button class="green">📅 افتح BLS و احجز - اكمل الباسبور و السيلفي و الذهبية</button></a>
-<p style="font-size:12px;color:#666">لازم تخلي الصفحة محلولة دايما باش المراقبة تخدم 24/24</p>
+<p style="font-size:12px;color:#666">خلي الصفحة محلولة دايما باش المراقبة تخدم 24/24</p>
 </div>
 <audio id="alarm" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 <script>
-const TOKEN = "8810366366:AAFH_g_FpQBIwepJEjWszGK6v7MS-gpxoOk";
-const CHAT_ID = "8810366366";
-
+const TOKEN = "8810366366:AAFH_g_FpQBlwepJEjWszGK6v7MS-gpxoOk";
+const CHAT_ID = "6002024244";
 let lastAlert = 0;
 function sendNotif(msg){
-  fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:msg})});
+  fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:msg})}).then(r=>r.json()).then(d=>{ if(!d.ok){ alert("خطأ: " + d.description) } else { alert("✅ وصلك في Telegram!") } });
 }
-function testNow(){ sendNotif("✅ تست 24/24: المراقبة تخدم - BLS ORAN - كي يفتح موعد في أي وقت نعيطلك"); alert("شوف التيليجرام - اذا خرجلك Forbidden لازم تبدل ID من @userinfobot"); }
-
-async function checkNow(){
-  document.getElementById('log').innerHTML = "جاري الفحص " + new Date().toLocaleTimeString() + "...<br>نراقب 24/24 - أي تغيير نعيطلك";
-  alert("المراقبة 24/24 خدامة. خلي الصفحة محلولة، كي يفتح موعد في أي وقت نعيطلك.");
-}
-
+function testNow(){ sendNotif("✅ تست 24/24: BLS ORAN - Lahcene - المراقبة تخدم - كي يفتح موعد نعيطلك"); }
+function checkNow(){ document.getElementById('log').innerHTML = "فحص " + new Date().toLocaleTimeString() + " - مراقبة 24/24 خدامة"; alert("المراقبة 24/24 خدامة - خلي الصفحة محلولة"); }
 setInterval(()=>{
   let n = new Date();
-  document.getElementById('status').innerHTML = "🟢 نراقب 24/24... " + n.toLocaleTimeString() + " | كل 5 ثواني | " + n.toLocaleDateString('ar-DZ');
+  document.getElementById('status').innerHTML = "🟢 نراقب 24/24... " + n.toLocaleTimeString() + " | كل 5 ثواني";
   let day=n.getDay(), h=n.getHours(), m=n.getMinutes(), s=n.getSeconds();
-
   if((day==5 && h==15 && m==58 && s<5) || (day==2 && h==16 && m==58 && s<5)){
-    if(Date.now()-lastAlert>60000){ lastAlert=Date.now(); sendNotif("🔥🔥 بعد 2 دقايق تفتح مواعيد وهران! وجد الباسبور و الذهبية - مراقبة 24/24"); document.getElementById('alarm').play(); }
+    if(Date.now()-lastAlert>60000){ lastAlert=Date.now(); sendNotif("🔥 بعد 2 دقايق تفتح مواعيد وهران! وجد الباسبور و الذهبية"); document.getElementById('alarm').play(); }
   }
   if((day==5 && h==16 && m==0 && s<5) || (day==2 && h==17 && m==0 && s<5)){
-    if(Date.now()-lastAlert>60000){ lastAlert=Date.now(); sendNotif("✅✅ فتحت ذرك! ORAN 3 - ادخل و احجز النهار و الوقت و كمل الباسبور / السيلفي / الذهبية:\nhttps://algeria.blsspainvisa.com/oran/"); document.getElementById('alarm').play(); window.open("https://algeria.blsspainvisa.com/oran/", "_blank"); }
+    if(Date.now()-lastAlert>60000){ lastAlert=Date.now(); sendNotif("✅✅ فتحت ذرك! ORAN - ادخل و احجز و كمل الباسبور / السيلفي / الذهبية:\nhttps://algeria.blsspainvisa.com/oran/"); document.getElementById('alarm').play(); window.open("https://algeria.blsspainvisa.com/oran/", "_blank"); }
   }
 }, 5000);
 </script>
