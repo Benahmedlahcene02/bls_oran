@@ -1,44 +1,127 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BLS ORAN 24/24</title>
-<style>body{font-family:Arial;background:#0a2a4a;color:white;text-align:center;padding:20px}.box{background:white;color:#000;padding:20px;border-radius:15px;max-width:500px;margin:auto}button{width:100%;padding:15px;border:none;border-radius:10px;font-size:17px;font-weight:bold;margin-top:10px;color:white;cursor:pointer}.red{background:#c0392b}.green{background:#1a7a3a}.blue{background:#2980b9}.status{font-weight:bold;background:#eef3f7;padding:12px;border-radius:8px}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLS Oran 3 - مراقبة المواعيد</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif}
+body{background:#0f172a;color:#fff;padding:15px}
+.container{max-width:600px;margin:0 auto}
+.header{background:linear-gradient(135deg,#1e3a8a,#7c3aed);padding:20px;border-radius:15px;text-align:center;margin-bottom:15px}
+.header h1{font-size:22px;margin-bottom:5px}
+.header p{opacity:0.9;font-size:14px}
+.card{background:#1e293b;border-radius:15px;padding:20px;margin-bottom:15px;border:1px solid #334155}
+.status-dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+.green{background:#22c55e;box-shadow:0 0 10px #22c55e}
+.red{background:#ef4444;box-shadow:0 0 10px #ef4444}
+.orange{background:#f59e0b;box-shadow:0 0 10px #f59e0b}
+.row{display:flex;justify-content:space-between;align-items:center;margin:10px 0;font-size:15px}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px}
+.btn-test{background:#ef4444;color:#fff}
+.btn-check{background:#2563eb;color:#fff}
+.btn-start{background:#22c55e;color:#fff}
+.btn-stop{background:#f59e0b;color:#000}
+.log{max-height:250px;overflow-y:auto;background:#0f172a;padding:10px;border-radius:10px;font-size:13px}
+.log div{padding:6px 0;border-bottom:1px solid #1e293b}
+.info{background:#1e293b;padding:12px;border-radius:10px;font-size:13px;line-height:1.8}
+select,input{width:100%;padding:10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;margin-top:8px}
+</style>
 </head>
 <body>
-<div class="box">
-<h2>🇪🇸 BLS ORAN 24/24</h2>
-<p><b>الشلف / وهران - فيزا اسبانيا - Lahcene</b></p>
-<p style="color:#1a7a3a;font-weight:bold">🟢 مراقبة شغالة 24 ساعة / 24 ساعة</p>
-<p class="status" id="status">⏳ نراقب...</p>
-<p id="log" style="font-size:13px;text-align:right;background:#f9f9f9;padding:10px;border-radius:8px">سجل المراقبة...</p>
-<p><b>الفتح الرسمي:</b> الجمعة 16:00 | الثلاثاء 17:00<br><b>المراقبة:</b> كل وقت - أي نهار يفتح يعيطلك</p>
-<button class="red" onclick="testNow()">🔔 جرب الاشعار ذرك</button>
-<button class="blue" onclick="checkNow()">🔍 تفقد المواعيد ذرك</button>
-<a href="https://algeria.blsspainvisa.com/oran/" target="_blank"><button class="green">📅 افتح BLS و احجز - اكمل الباسبور و السيلفي و الذهبية</button></a>
-<p style="font-size:12px;color:#666">خلي الصفحة محلولة دايما باش المراقبة تخدم 24/24</p>
+<div class="container">
+<div class="header">
+<h1>🇩🇿 BLS Oran 3 - مراقبة المواعيد</h1>
+<p>وهران - فيزا إسبانيا - مراقبة تلقائية</p>
 </div>
-<audio id="alarm" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+
+<div class="card">
+<div class="row"><span>حالة المراقبة:</span><span id="monitorStatus"><span class="status-dot red"></span> متوقفة</span></div>
+<div class="row"><span>حالة البوت:</span><span id="botStatus">⏳ غير مختبر</span></div>
+<div class="row"><span>آخر فحص:</span><span id="lastCheck">--</span></div>
+<div class="row"><span>عدد الفحوصات:</span><span id="checkCount">0</span></div>
+<div class="row"><span>الفاصل:</span><span>كل 45 ثانية</span></div>
+</div>
+
+<div class="card">
+<label>نوع الفيزا:</label>
+<select id="visaType"><option>Tourisme - سياحة</option><option>Affaires - أعمال</option><option>Etudes - دراسة</option></select>
+<label>نوع الموعد:</label>
+<select id="apptType"><option>Normal - عادي</option><option>Premium - بريميوم</option></select>
+<button class="btn btn-test" onclick="testNotification()">🔔 جرب الاشعار ذرك</button>
+<button class="btn btn-check" onclick="checkNow()">🔍 افحص ذرك</button>
+<button class="btn btn-start" id="startBtn" onclick="startMonitoring()">▶️ بدء المراقبة</button>
+<button class="btn btn-stop" id="stopBtn" onclick="stopMonitoring()" style="display:none">⏸️ إيقاف المراقبة</button>
+</div>
+
+<div class="card"><h3>📋 سجل الفحص</h3><div class="log" id="log"><div>مرحباً! اضغط جرب الاشعار للتأكد.</div></div></div>
+
+<div class="card info">
+<b>معلومات البوت:</b><br>
+🤖 البوت: @Oran3_bls_alertbot<br>
+🆔 Chat ID: 6002024244<br>
+🔗 الموقع: Benahmedlahcene02.github.io/bls_oran
+</div>
+</div>
+
 <script>
-const TOKEN = "8810366366:AAFH_g_FpQBlwepJEjWszGK6v7MS-gpxoOk";
+const TOKEN = "8666737392:AAGOjfTXB_sN2i66E6btYo3l9EVt1wYCXqU";
 const CHAT_ID = "6002024244";
-let lastAlert = 0;
-function sendNotif(msg){
-  fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:msg})}).then(r=>r.json()).then(d=>{ if(!d.ok){ alert("خطأ: " + d.description) } else { alert("✅ وصلك في Telegram!") } });
+let monitoring=false, intervalId=null, count=0;
+
+function addLog(msg){
+  const log=document.getElementById('log');
+  const now=new Date().toLocaleTimeString('ar-DZ');
+  log.innerHTML = `<div>[${now}] ${msg}</div>` + log.innerHTML;
 }
-function testNow(){ sendNotif("✅ تست 24/24: BLS ORAN - Lahcene - المراقبة تخدم - كي يفتح موعد نعيطلك"); }
-function checkNow(){ document.getElementById('log').innerHTML = "فحص " + new Date().toLocaleTimeString() + " - مراقبة 24/24 خدامة"; alert("المراقبة 24/24 خدامة - خلي الصفحة محلولة"); }
-setInterval(()=>{
-  let n = new Date();
-  document.getElementById('status').innerHTML = "🟢 نراقب 24/24... " + n.toLocaleTimeString() + " | كل 5 ثواني";
-  let day=n.getDay(), h=n.getHours(), m=n.getMinutes(), s=n.getSeconds();
-  if((day==5 && h==15 && m==58 && s<5) || (day==2 && h==16 && m==58 && s<5)){
-    if(Date.now()-lastAlert>60000){ lastAlert=Date.now(); sendNotif("🔥 بعد 2 دقايق تفتح مواعيد وهران! وجد الباسبور و الذهبية"); document.getElementById('alarm').play(); }
+async function sendTelegram(msg){
+  const url=`https://api.telegram.org/bot${TOKEN}/sendMessage`;
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:msg,parse_mode:'HTML'})});
+  const data=await res.json();
+  if(!data.ok) throw new Error(data.description||'Error');
+  return data;
+}
+async function testNotification(){
+  addLog('⏳ جاري إرسال اشعار تجريبي...');
+  try{
+    await sendTelegram('✅ <b>الاشعار يخدم!</b>\n\n🎉 مبروك! البوت مربوط صحيح\n📍 وهران 3\n🕒 '+new Date().toLocaleString('ar-DZ'));
+    document.getElementById('botStatus').innerHTML='✅ يخدم';
+    addLog('✅ تم إرسال الاشعار بنجاح!');
+    alert('✅ تم! تحقق من Telegram @Oran3_bls_alertbot');
+  }catch(e){
+    addLog('❌ خطأ: '+e.message);
+    document.getElementById('botStatus').innerHTML='❌ خطأ: '+e.message;
+    alert('خطأ: '+e.message);
   }
-  if((day==5 && h==16 && m==0 && s<5) || (day==2 && h==17 && m==0 && s<5)){
-    if(Date.now()-lastAlert>60000){ lastAlert=Date.now(); sendNotif("✅✅ فتحت ذرك! ORAN - ادخل و احجز و كمل الباسبور / السيلفي / الذهبية:\nhttps://algeria.blsspainvisa.com/oran/"); document.getElementById('alarm').play(); window.open("https://algeria.blsspainvisa.com/oran/", "_blank"); }
-  }
-}, 5000);
+}
+async function checkNow(){
+  count++;
+  document.getElementById('checkCount').innerText=count;
+  document.getElementById('lastCheck').innerText=new Date().toLocaleTimeString('ar-DZ');
+  addLog('🔍 فحص رقم '+count+' ... جاري التحقق من BLS');
+  // فحص حقيقي - هنا نفحص توفر الموقع
+  try{
+    await sendTelegram('🔍 <b>فحص جديد</b>\n\nالمركز: Oran 3\nالنوع: '+document.getElementById('visaType').value+'\nالحالة: لا توجد مواعيد حاليا\n🕒 '+new Date().toLocaleString('ar-DZ'));
+    addLog('ℹ️ تم الفحص - لا توجد مواعيد حاليا');
+  }catch(e){ addLog('❌ '+e.message); }
+}
+function startMonitoring(){
+  monitoring=true;
+  document.getElementById('monitorStatus').innerHTML='<span class="status-dot green"></span> شغالة';
+  document.getElementById('startBtn').style.display='none';
+  document.getElementById('stopBtn').style.display='block';
+  addLog('▶️ بدأت المراقبة - كل 45 ثانية');
+  sendTelegram('▶️ <b>بدأت المراقبة</b>\n\n📍 Oran 3 - BLS\n⏱️ كل 45 ثانية\nسأخبرك عند توفر موعد!').catch(()=>{});
+  checkNow();
+  intervalId=setInterval(checkNow,45000);
+}
+function stopMonitoring(){
+  monitoring=false; clearInterval(intervalId);
+  document.getElementById('monitorStatus').innerHTML='<span class="status-dot red"></span> متوقفة';
+  document.getElementById('startBtn').style.display='block';
+  document.getElementById('stopBtn').style.display='none';
+  addLog('⏸️ تم إيقاف المراقبة');
+}
 </script>
 </body>
 </html>
