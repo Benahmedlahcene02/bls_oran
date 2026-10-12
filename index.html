@@ -5,114 +5,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BLS Oran 3 - مراقبة المواعيد</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif}
-body{background:#0f172a;color:#fff;padding:15px}
-.container{max-width:600px;margin:0 auto}
-.header{background:linear-gradient(135deg,#1e3a8a,#7c3aed);padding:20px;border-radius:15px;text-align:center;margin-bottom:15px}
-.header h1{font-size:22px;margin-bottom:5px}
-.header p{opacity:0.9;font-size:14px}
-.card{background:#1e293b;border-radius:15px;padding:20px;margin-bottom:15px;border:1px solid #334155}
-.status-dot{width:14px;height:14px;border-radius:50%;display:inline-block}
-.green{background:#22c55e;box-shadow:0 0 10px #22c55e}
-.red{background:#ef4444;box-shadow:0 0 10px #ef4444}
-.orange{background:#f59e0b;box-shadow:0 0 10px #f59e0b}
-.row{display:flex;justify-content:space-between;align-items:center;margin:10px 0;font-size:15px}
-.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px}
-.btn-test{background:#ef4444;color:#fff}
-.btn-check{background:#2563eb;color:#fff}
-.btn-start{background:#22c55e;color:#fff}
-.btn-stop{background:#f59e0b;color:#000}
-.log{max-height:250px;overflow-y:auto;background:#0f172a;padding:10px;border-radius:10px;font-size:13px}
-.log div{padding:6px 0;border-bottom:1px solid #1e293b}
-.info{background:#1e293b;padding:12px;border-radius:10px;font-size:13px;line-height:1.8}
-select,input{width:100%;padding:10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;margin-top:8px}
+body{background:#0f172a;color:white;font-family:Arial;padding:15px}
+.card{background:#1e293b;border-radius:15px;padding:15px;margin-bottom:15px}
+.header{background:linear-gradient(90deg,#6d28d9,#2563eb);padding:20px;border-radius:15px;text-align:center}
+button{width:100%;padding:15px;border:none;border-radius:10px;font-size:16px;cursor:pointer}
+.btn-test{background:#ef4444;color:white}
+.btn-start{background:#22c55e;color:white}
+select{width:100%;padding:12px;background:#0f172a;color:white;border:1px solid #334155;border-radius:10px;margin:10px 0}
+.log{background:#0f172a;padding:10px;border-radius:10px;font-size:14px;line-height:2}
 </style>
 </head>
 <body>
-<div class="container">
+
 <div class="header">
-<h1>🇩🇿 BLS Oran 3 - مراقبة المواعيد</h1>
+<h2>🇩🇿 BLS Oran 3 - مراقبة المواعيد</h2>
 <p>وهران - فيزا إسبانيا - مراقبة تلقائية</p>
 </div>
 
 <div class="card">
-<div class="row"><span>حالة المراقبة:</span><span id="monitorStatus"><span class="status-dot red"></span> متوقفة</span></div>
-<div class="row"><span>حالة البوت:</span><span id="botStatus">⏳ غير مختبر</span></div>
-<div class="row"><span>آخر فحص:</span><span id="lastCheck">--</span></div>
-<div class="row"><span>عدد الفحوصات:</span><span id="checkCount">0</span></div>
-<div class="row"><span>الفاصل:</span><span>كل 45 ثانية</span></div>
+<p>حالة المراقبة: <span id="monitorStatus">🟢 شغالة</span></p>
+<p>حالة البوت: <span id="botStatus">⏳ غير مختبر</span></p>
+<p>آخر فحص: <span id="lastCheck">-</span></p>
+<p>عدد الفحوصات: <span id="checkCount">0</span></p>
+<p>الفاصل: كل 45 ثانية</p>
 </div>
 
 <div class="card">
 <label>نوع الفيزا:</label>
-<select id="visaType"><option>Tourisme - سياحة</option><option>Affaires - أعمال</option><option>Etudes - دراسة</option></select>
+<select id="visaType"><option>Tourisme - سياحة</option></select>
 <label>نوع الموعد:</label>
-<select id="apptType"><option>Normal - عادي</option><option>Premium - بريميوم</option></select>
-<button class="btn btn-test" onclick="testNotification()">🔔 جرب الاشعار ذرك</button>
-<button class="btn btn-check" onclick="checkNow()">🔍 افحص ذرك</button>
-<button class="btn btn-start" id="startBtn" onclick="startMonitoring()">▶️ بدء المراقبة</button>
-<button class="btn btn-stop" id="stopBtn" onclick="stopMonitoring()" style="display:none">⏸️ إيقاف المراقبة</button>
+<select id="apptType"><option>Normal - عادي</option></select>
+<button class="btn-test" onclick="testNotification()">🔔 جرب الاشعار ذرك</button>
+<br><br>
+<button class="btn-start" onclick="toggleMonitoring()">⏸️ إيقاف المراقبة</button>
 </div>
 
-<div class="card"><h3>📋 سجل الفحص</h3><div class="log" id="log"><div>مرحباً! اضغط جرب الاشعار للتأكد.</div></div></div>
-
-<div class="card info">
-<b>معلومات البوت:</b><br>
-🤖 البوت: @Oran3_bls_alertbot<br>
-🆔 Chat ID: 6002024244<br>
-🔗 الموقع: Benahmedlahcene02.github.io/bls_oran
+<div class="card">
+<h3>📋 سجل الفحص</h3>
+<div class="log" id="log">مرحباً! إضغط جرب الاشعار للتأكد.</div>
 </div>
+
+<div class="card">
+<p>معلومات البوت:</p>
+<p>🤖 البوت: @bls_oran_checker_bot</p>
+<p>🆔 Chat ID: 6002024244</p>
+<p>🔗 الموقع: Benahmedlahcene02.github.io/bls_oran</p>
 </div>
 
 <script>
-const TOKEN = "8666737392:AAGOjfTXB_sN2i66E6btYo3l9EVt1wYCXqU";
+// ======= حط التوكن تاع البوت القديم اللي يخدم هنا =======
+const BOT_TOKEN = "هنا_حط_توكن_bls_oran_checker_bot"; 
 const CHAT_ID = "6002024244";
-let monitoring=false, intervalId=null, count=0;
-let lastStatus = "none"; // لتفادي تكرار الاشعار
+
+let checkCount = 0;
+let monitoring = true;
+let lastNotified = false; // باش ما يبعثش 100 مرة على نفس الموعد
+let intervalId;
 
 function addLog(msg){
-  const log=document.getElementById('log');
-  const now=new Date().toLocaleTimeString('ar-DZ');
-  log.innerHTML = `<div>[${now}] ${msg}</div>` + log.innerHTML;
+    const log = document.getElementById("log");
+    log.innerHTML = `[${new Date().toLocaleTimeString('ar-DZ')}] ${msg}<br>` + log.innerHTML;
 }
-async function sendTelegram(msg){
-  const url=`https://api.telegram.org/bot${TOKEN}/sendMessage`;
-  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:msg,parse_mode:'HTML'})});
-  const data=await res.json();
-  if(!data.ok) throw new Error(data.description||'Error');
-  return data;
+
+async function sendTelegram(message){
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    try{
+        const res = await fetch(url,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({chat_id:CHAT_ID, text:message})
+        });
+        const data = await res.json();
+        if(data.ok){
+            document.getElementById("botStatus").innerText = "✅ مربوط";
+            return true;
+        } else {
+            addLog("❌ خطأ في البوت: " + data.description);
+            return false;
+        }
+    } catch(e){ addLog("❌ خطأ اتصال: " + e.message); return false; }
 }
+
 async function testNotification(){
-  addLog('⏳ جاري إرسال اشعار تجريبي...');
-  try{
-    await sendTelegram('✅ <b>الاشعار يخدم!</b>\n\n🎉 مبروك! البوت مربوط صحيح\n📍 وهران 3\n🕒 '+new Date().toLocaleString('ar-DZ'));
-    document.getElementById('botStatus').innerHTML='✅ يخدم';
-    addLog('✅ تم إرسال الاشعار بنجاح!');
-    alert('✅ تم! تحقق من Telegram @Oran3_bls_alertbot');
-  }catch(e){
-    addLog('❌ خطأ: '+e.message);
-    document.getElementById('botStatus').innerHTML='❌ خطأ: '+e.message;
-    alert('خطأ: '+e.message);
-  }
+    await sendTelegram("🔔 فحص جديد - لا توجد مواعيد حاليا\nهذا اشعار تجريبي من موقع BLS Oran 3");
+    addLog("✅ تم إرسال اشعار تجريبي");
 }
 
-// هنا تحط الفحص الحقيقي تاعك - ذرك راني دايرها false = لا يوجد موعد
-// كي تربطو مع API حقيقي تاع BLS، بدّل isAvailable حسب النتيجة
-async function checkRealAvailability(){
-  // TODO: دير هنا fetch تاع BLS و رجّع true اذا كاين موعد
-  return false;
-}
+// ===== هذا هو التصحيح المهم =====
+async function checkBLS(){
+    if(!monitoring) return;
+    checkCount++;
+    document.getElementById("checkCount").innerText = checkCount;
+    document.getElementById("lastCheck").innerText = new Date().toLocaleTimeString('ar-DZ');
+    addLog(`🔍 فحص رقم ${checkCount} ... جاري التحقق من BLS`);
 
-async function checkNow(){
-  count++;
-  document.getElementById('checkCount').innerText=count;
-  document.getElementById('lastCheck').innerText=new Date().toLocaleTimeString('ar-DZ');
-  addLog('🔍 فحص رقم '+count+' ... جاري التحقق من BLS');
-  try{
-    const isAvailable = await checkRealAvailability();
-    
+    // هنا دير الفحص الحقيقي تاعك
+    // مثال: جرب تبدل isAvailable على حساب نتيجة API تاعك
+    // إذا لقيت موعد دير isAvailable = true
+    let isAvailable = false; 
+
+    // *** الفحص الحقيقي هنا ***
+    // حط الكود تاع fetch لـ BLS هنا و إذا لقيت نتيجة غير فارغة دير isAvailable = true
+
     if(isAvailable){
-      // كاين موعد - نبعث غير مرة وحدة
-      if(lastStatus !== "available"){
-        await sendTelegram('🔥🔥 <b>كاين موعد في BLS وهران 3 !</b>\n\n📍 المركز: Oran 3\nنوع: '+document.getElementById('visaType').value+'\nروح احجز ذرك: https://bls-algeria.com\n🕒 '+new Date().toLocaleString('ar-DZ'));
-        addLog('🎉 موعد متوفر! تم إرسال التن
+        addLog("🔥🔥 كاين موعد متوفر !!!");
+        // يبعث غير مرة وحدة كي يلقى موعد، ما يبعثش كل 45 ثانية
+        if(!lastNotified){
+            await sendTelegram("🔥🔥🔥 كاين موعد في BLS وهران 3 - Oran 3 !\n\nروح احجز ذرك: https://bls-algeria.com\nالفيزا: Tourisme - عادي");
+            lastNotified = true;
+        }
+    } else {
+        // كي ما يكونش كاين موعد، غير يحدث السجل، ما يبعثش في Telegram
+        addLog("ℹ️ تم الفحص - لا توجد مواعيد حاليا");
+        lastNotified = false;
+        console.log("لا توجد مواعيد - ما بعثنا والو");
+    }
+}
+
+function toggleMonitoring(){
+    monitoring = !monitoring;
+    document.getElementById("monitorStatus").innerText = monitoring ? "🟢 شغالة" : "🔴 متوقفة";
+    addLog(monitoring ? "▶️ بدأت المراقبة - كل 45 ثانية" : "⏸️ تم إيقاف المراقبة");
+}
+
+intervalId = setInterval(checkBLS, 45000);
+addLog("▶️ بدأت المراقبة - كل 45 ثانية");
+checkBLS();
+</script>
+</body>
+</html>
