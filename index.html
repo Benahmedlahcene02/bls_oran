@@ -3,141 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BLS Oran 3 - مراقبة المواعيد</title>
+<title>BLS Oran 3</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #0f172a; color: white; padding: 15px; text-align: center; }
-  .card { background: #1e293b; border-radius: 15px; padding: 20px; max-width: 500px; margin: auto; }
-  h1 { font-size: 22px; }
-  .status { font-size: 18px; padding: 12px; border-radius: 10px; background: #334155; margin: 15px 0; }
-  .status.available { background: #16a34a; }
-  button { width: 100%; padding: 14px; margin: 6px 0; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
-  .start { background: #22c55e; color: white; }
-  .stop { background: #ef4444; color: white; }
-  .test { background: #3b82f6; color: white; }
-  #log { background: black; color: #a7f3d0; text-align: left; direction: ltr; padding: 10px; border-radius: 10px; height: 250px; overflow-y: auto; font-size: 13px; margin-top: 15px; }
-  input { width: 94%; padding: 10px; margin: 5px 0; border-radius: 8px; border: none; }
+body{font-family:Arial;background:#0f172a;color:#fff;padding:15px;text-align:center}
+.card{background:#1e293b;border-radius:15px;padding:20px;max-width:500px;margin:auto}
+.status{padding:12px;border-radius:10px;background:#334155;margin:15px 0;font-size:18px}
+.status.available{background:#16a34a}
+button{width:100%;padding:14px;margin:6px 0;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer}
+.start{background:#22c55e;color:#fff}.stop{background:#ef4444;color:#fff}.test{background:#3b82f6;color:#fff}
+#log{background:#000;color:#a7f3d0;text-align:left;direction:ltr;padding:10px;border-radius:10px;height:280px;overflow-y:auto;font-size:13px}
+input{width:94%;padding:10px;margin:5px 0;border-radius:8px;border:none}
 </style>
 </head>
 <body>
 <div class="card">
-  <h1>🔍 BLS Oran 3 - فحص المواعيد</h1>
-  <div id="status" class="status">⏸️ متوقف</div>
-  <p>عدد الفحوصات: <b id="count">0</b> | آخر فحص: <span id="last">-</span></p>
-
-  <input id="token" placeholder="Telegram Bot Token" value="">
-  <input id="chatId" placeholder="Chat ID" value="6002024244">
-  <input id="blsUrl" placeholder="رابط BLS" value="https://bls-algeria.com/">
-
-  <button class="start" onclick="startCheck()">▶️ بدء الفحص</button>
-  <button class="stop" onclick="stopCheck()">⏹️ إيقاف</button>
-  <button class="test" onclick="testTelegram()">📩 تجربة Telegram</button>
-
-  <div id="log"></div>
+<h1>🔍 BLS Oran 3</h1>
+<div id="status" class="status">⏸️ متوقف</div>
+<p>فحص: <b id="count">0</b> | آخر: <span id="last">-</span></p>
+<input id="token" placeholder="Telegram Bot Token" value="">
+<input id="chatId" placeholder="Chat ID" value="6002024244">
+<input id="blsUrl" placeholder="رابط BLS" value="https://bls-algeria.com/">
+<button class="start" onclick="startCheck()">▶️ بدء الفحص</button>
+<button class="stop" onclick="stopCheck()">⏹️ إيقاف</button>
+<button class="test" onclick="testTelegram()">📩 تجربة Telegram</button>
+<div id="log"></div>
 </div>
-
 <script>
-let interval = null;
-let count = 0;
-let lastNotified = false;
-
-function addLog(msg) {
-  const log = document.getElementById('log');
-  const time = new Date().toLocaleTimeString('ar-DZ');
-  log.innerHTML += `[${time}] ${msg}<br>`;
-  log.scrollTop = log.scrollHeight;
-}
-
-async function sendTelegram(msg) {
-  const token = document.getElementById('token').value.trim();
-  const chatId = document.getElementById('chatId').value.trim();
-  if(!token || !chatId) { addLog('⚠️ دخل التوكن و Chat ID'); return; }
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ chat_id: chatId, text: msg })
-    });
-    const data = await res.json();
-    if(data.ok) addLog('✅ تم إرسال Telegram');
-    else addLog('❌ فشل Telegram: ' + data.description);
-  } catch(e) {
-    addLog('❌ خطأ Telegram: ' + e.message);
-  }
-}
-
-async function checkBLS() {
-  count++;
-  document.getElementById('count').innerText = count;
-  document.getElementById('last').innerText = new Date().toLocaleTimeString('ar-DZ');
-  
-  const blsUrl = document.getElementById('blsUrl').value.trim();
-  addLog(`🔍 فحص رقم ${count} ... جاري التحقق من BLS`);
-
-  // نجرب 2 وسيط (Proxy) باش نتفاداو Failed to fetch
-  const proxies = [
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(blsUrl)}`,
-    `https://corsproxy.io/?url=${encodeURIComponent(blsUrl)}`
-  ];
-
-  let html = "";
-  let success = false;
-
-  for(let p of proxies) {
-    try {
-      const r = await fetch(p);
-      html = await r.text();
-      success = true;
-      break;
-    } catch(e) { continue; }
-  }
-
-  if(!success) {
-    addLog('❌ خطأ اتصال: Failed to fetch - كل الوسطاء فشلوا');
-    return;
-  }
-
-  // هنا الكلمات اللي تعني كاين موعد
-  // تقدر تزيد كلمات حسب موقع BLS
-  const low = html.toLowerCase();
-  const isAvailable = 
-    low.includes('available') ||
-    low.includes('book now') ||
-    low.includes('متوفر') ||
-    low.includes('appointment available') ||
-    !low.includes('no appointment') && !low.includes('no slot');
-
-  const status = document.getElementById('status');
-  if(isAvailable && !lastNotified) {
-    status.innerText = '🔥 كاين موعد !!';
-    status.className = 'status available';
-    addLog('🔥 كاين موعد ! تم إرسال تنبيه');
-    await sendTelegram('🔥🔥 كاين موعد BLS Oran 3 ! روح احجز ذرك: ' + blsUrl);
-    lastNotified = true;
-  } else if(isAvailable) {
-    addLog('🔥 ما زال كاين موعد');
-  } else {
-    status.innerText = 'ℹ️ لا توجد مواعيد حاليا';
-    status.className = 'status';
-    addLog('ℹ️ تم الفحص - لا توجد مواعيد حاليا');
-    lastNotified = false;
-  }
-}
-
-function startCheck() {
-  if(interval) return;
-  addLog('▶️ بدأ الفحص التلقائي كل 45 ثانية');
-  checkBLS();
-  interval = setInterval(checkBLS, 45000);
-  document.getElementById('status').innerText = '🟢 الفحص شغال...';
-}
-function stopCheck() {
-  clearInterval(interval); interval = null;
-  addLog('⏹️ تم الإيقاف');
-  document.getElementById('status').innerText = '⏸️ متوقف';
-}
-function testTelegram() { sendTelegram('✅ تجربة ناجحة - بوت BLS Oran 3 يخدم'); }
-
-addLog('📱 جاهز - اضغط بدء الفحص');
-</script>
-</body>
-</html>
+let interval=null, count=0, last
