@@ -1,55 +1,38 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>حجز موعد فيزا اسبانيا - ORAN 3</title>
-<style>
-body{font-family:Arial;background:#0a2a4a;margin:0;padding:20px;color:#fff}
-.container{max-width:500px;margin:auto;background:#fff;color:#000;padding:25px;border-radius:15px}
-h2{text-align:center;color:#c0392b}
-label{font-weight:bold;display:block;margin-top:12px}
-input,select{width:100%;padding:12px;margin-top:5px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
-button{width:100%;padding:14px;margin-top:20px;background:#c0392b;color:white;border:none;border-radius:8px;font-size:17px;font-weight:bold;cursor:pointer}
-#msg{text-align:center;margin-top:15px;font-weight:bold}
-.info{background:#fff3cd;padding:12px;border-radius:8px;margin-top:15px;font-size:13px}
-</style>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>حجز موعد فيزا اسبانيا - ORAN 3 وهران</title>
+<style>body{font-family:Arial;background:#0a2a4a;color:white;text-align:center;padding:20px} .box{background:white;color:#000;padding:20px;border-radius:15px;max-width:450px;margin:auto} button{width:100%;padding:14px;background:#c0392b;color:white;border:none;border-radius:10px;font-size:16px;font-weight:bold;margin-top:15px}</style>
 </head>
 <body>
-<div class="container">
-<h2>🇪🇸 طلب موعد فيزا اسبانيا</h2>
-<p style="text-align:center">مركز BLS وهران - ORAN 3</p>
-<form id="form">
-<label>الاسم و اللقب (كما في الباسبور)</label>
-<input type="text" id="name" required>
-<label>رقم الهاتف</label>
-<input type="tel" id="phone" required>
-<label>الولاية</label>
-<select id="wilaya"><option>Chlef</option><option>Oran</option><option>Tiaret</option><option>Mostaganem</option><option>Tlemcen</option><option>Relizane</option><option>Saida</option><option>Mascara</option></select>
-<label>الفئة</label>
-<select id="cat"><option>ORAN 3</option><option>ORAN 1</option><option>ORAN 2</option><option>ORAN 4</option></select>
-<label>نوع الفيزا</label>
-<select id="type"><option>Tourisme - سياحة</option><option>Visite familiale - زيارة عائلية</option><option>Affaires - عمل</option></select>
-<label>تاريخ السفر المتوقع</label>
-<input type="date" id="date" required>
-<button type="submit">اطلب الموعد - شدلي النهار والوقت</button>
-</form>
-<div id="msg"></div>
-<div class="info">⚠️ الملف: باسبور + فيزا اسبانية قديمة + حجز طيران + تأمين + كشف حساب 3 أشهر. المواعيد تفتح الجمعة 16:00 و الثلاثاء 17:00</div>
+<div class="box">
+<h2>🇪🇸 مراقب مواعيد BLS وهران</h2>
+<p>ORAN 3 - الشلف / وهران</p>
+<p id="status">الحالة: نراقب...</p>
+<p>المواعيد تفتح:</p>
+<p><b>الجمعة 16:00</b><br><b>الثلاثاء 17:00</b></p>
+<button onclick="testNow()">جرب الاشعار ذرك</button>
+<a href="https://algeria.blsspainvisa.com/appointment.php" target="_blank"><button style="background:#1a7a3a">روح لموقع BLS و احجز</button></a>
+<p style="font-size:12px;color:#666">خلي هاذ الصفحة محلولة في التيليفون باش يجيك الاشعار</p>
 </div>
 <script>
 const TOKEN = "حط التوكن الجديد هنا";
 const CHAT_ID = "6002024244";
-document.getElementById('form').addEventListener('submit', async function(e){
-e.preventDefault();
-let text = `طلب موعد جديد - ORAN 3:\nالاسم: ${document.getElementById('name').value}\nالهاتف: ${document.getElementById('phone').value}\nالولاية: ${document.getElementById('wilaya').value}\nالفئة: ${document.getElementById('cat').value}\nالنوع: ${document.getElementById('type').value}\nتاريخ السفر: ${document.getElementById('date').value}`;
-document.getElementById('msg').innerText="جاري الإرسال...";
-try{
-let res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:text})});
-if(res.ok){document.getElementById('msg').innerText="تم استلام طلبك ✅ راح نعيطولك";document.getElementById('msg').style.color="green";}
-else{document.getElementById('msg').innerText="خطأ - عاود";}}
-catch(err){document.getElementById('msg').innerText="خطأ في الاتصال";}
-});
+function sendNotif(msg){
+  fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:msg})});
+}
+function testNow(){ sendNotif("✅ تست الاشعار: الاشعارات راهي تخدم - BLS Oran"); alert("شوف التيليجرام ذرك"); }
+setInterval(()=>{
+  let n = new Date();
+  let day = n.getDay();
+  let h = n.getHours(); let m = n.getMinutes();
+  document.getElementById('status').innerText = "الحالة: نراقب... " + n.toLocaleTimeString();
+  if((day==5 && h==15 && m==58) || (day==2 && h==16 && m==58)){
+    sendNotif("🔥 تنبيه BLS وهران: المواعيد راح تفتح بعد 2 دقايق! ادخل ذرك");
+  }
+  if((day==5 && h==16 && m==0) || (day==2 && h==17 && m==0)){
+    sendNotif("✅ فتحت المواعيد ذرك في وهران! ORAN 3 - ادخل و احجز النهار و الوقت");
+  }
+}, 30000);
 </script>
 </body>
 </html>
