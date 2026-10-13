@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BLS Oran 3 - FINAL</title>
+<title>BLS Oran 3 - Checker</title>
 <style>
 *{box-sizing:border-box}
 body{font-family:system-ui,Arial;background:#0f172a;color:#fff;padding:12px;margin:0;text-align:center}
@@ -23,15 +23,15 @@ button{width:100%;padding:14px;margin:6px 0;border:none;border-radius:12px;font-
 </head>
 <body>
 <div class="card">
-<h1>🔍 BLS Oran 3 - FINAL</h1>
+<h1>🔍 BLS Oran 3 - Tourisme</h1>
 <div id="status" class="status">⏸️ متوقف</div>
 <div class="row">
 <div class="box">فحص: <b id="count">0</b></div>
 <div class="box">آخر: <span id="last">-</span></div>
 </div>
-<input id="token" placeholder="حط التوكن الكامل من BotFather هنا" value="">
+<input id="token" placeholder="حط التوكن من BotFather">
 <input id="chatId" placeholder="Chat ID" value="6002024244">
-<input id="blsUrl" placeholder="https://bls-algeria.com/" value="https://bls-algeria.com/">
+<input id="blsUrl" value="https://algeria.blsspainvisa.com/book_appointment.php">
 <button class="start" onclick="startCheck()">▶️ بدء الفحص</button>
 <button class="stop" onclick="stopCheck()">⏹️ إيقاف</button>
 <button class="test" onclick="testTelegram()">📩 تجربة Telegram</button>
@@ -57,15 +57,11 @@ function setStatus(txt,cls){
   const s=document.getElementById('status');
   s.innerText=txt; s.className='status '+cls;
 }
-function cleanUrl(u){
-  u=u.trim().replace(/^\/+/,'');
-  if(!u.startsWith('http')) u='https://'+u;
-  return u;
-}
+
 async function sendTelegram(msg){
   const token=tokenInput.value.trim();
   const chatId=chatInput.value.trim();
-  if(!token){addLog('⚠️ حط التوكن الكامل','orange');return false;}
+  if(!token){addLog('⚠️ حط التوكن أولا','orange');return false;}
   try{
     const res=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -73,8 +69,8 @@ async function sendTelegram(msg){
     });
     const d=await res.json();
     if(d.ok){addLog('✅ Telegram تم','#4ade80');return true;}
-    if(d.description && d.description.includes('blocked')) addLog('❌ بلوكيت البوت! دير Unblock + Start','red');
-    else addLog('❌ Telegram: '+(d.description||'توكن غلط - تأكد من التوكن كامل'),'red');
+    if(d.description && d.description.includes('blocked')) addLog('❌ بلوكيت البوت! دير Start في Telegram','red');
+    else addLog('❌ Telegram: '+(d.description||'توكن غلط'),'red');
     return false;
   }catch(e){addLog('❌ خطأ Telegram: '+e.message,'red');return false;}
 }
@@ -83,16 +79,14 @@ async function checkBLS(){
   count++;
   document.getElementById('count').innerText=count;
   document.getElementById('last').innerText=new Date().toLocaleTimeString();
-  const blsUrl=cleanUrl(urlInput.value);
-  urlInput.value=blsUrl;
+  const blsUrl=urlInput.value.trim();
   addLog(`🔍 فحص #${count} ...`);
 
   const proxies=[
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(blsUrl)}`,
     `https://api.allorigins.win/get?url=${encodeURIComponent(blsUrl)}`,
     `https://r.jina.ai/${blsUrl}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(blsUrl)}`,
-    `https://corsproxy.io/?url=${encodeURIComponent(blsUrl)}`,
-    `https://proxy.cors.sh/${blsUrl}`
+    `https://corsproxy.io/?url=${encodeURIComponent(blsUrl)}`
   ];
 
   let html="", ok=false;
@@ -108,21 +102,22 @@ async function checkBLS(){
   }
 
   if(!ok){
-    addLog('❌ فشل الاتصال - BLS يبلوكي الفحص','red');
-    setStatus('❌ مشكلة اتصال - جاري المحاولة','err');
+    addLog('❌ فشل الاتصال - BLS يبلوكي - نعاود','red');
+    setStatus('❌ مشكلة اتصال - نعاود','err');
     return;
   }
 
   const low=html.toLowerCase();
-  const noSlot=low.includes('no appointment')||low.includes('no slot')||low.includes('no available')||low.includes('not available')||low.includes('fully booked')||low.includes('no date');
-  const hasAvailable=low.includes('available')||low.includes('book now')||low.includes('appointment available');
-  const isAvailable=hasAvailable && !noSlot;
+  // BLS Oran: موعد متوفر = وجود تاريخ قابل للحجز و عدم وجود رسالة لا توجد
+  const noSlot = low.includes('no appointment') || low.includes('no slot') || low.includes('no available') || low.includes('not available') || low.includes('fully booked') || low.includes('no date');
+  const hasAvailable = low.includes('available') || low.includes('book now') || low.includes('select date') || low.includes('appointment available');
+  const isAvailable = hasAvailable && !noSlot;
 
   if(isAvailable){
     setStatus('🔥 كاين موعد !!','ok');
     addLog('🔥 كاين موعد صحيح!','#4ade80');
     if(!lastNotified){
-      const sent=await sendTelegram('🔥 كاين موعد BLS Oran 3 ! روح احجز: '+blsUrl);
+      const sent=await sendTelegram('🔥 كاين موعد BLS Oran 3 Tourisme ! روح احجز ذرك: '+blsUrl);
       if(sent) lastNotified=true;
     }
   } else {
@@ -134,18 +129,18 @@ async function checkBLS(){
 
 function startCheck(){
   if(interval) return;
-  if(!tokenInput.value.trim()){alert('حط التوكن الكامل أولا');return;}
-  addLog('▶️ بدأ الفحص كل 45 ثانية','#22c55e');
+  if(!tokenInput.value.trim()){alert('حط التوكن أولا');return;}
+  addLog('▶️ بدأ الفحص كل 60 ثانية','#22c55e');
   setStatus('🟢 الفحص شغال...','work');
   checkBLS();
-  interval=setInterval(checkBLS,45000);
+  interval=setInterval(checkBLS,60000);
 }
 function stopCheck(){
   clearInterval(interval); interval=null;
   addLog('⏹️ تم الإيقاف'); setStatus('⏸️ متوقف','');
 }
 function testTelegram(){sendTelegram('✅ تجربة ناجحة - BLS Oran 3 يخدم');}
-addLog('📱 جاهز - حط التوكن الكامل و اضغط بدء','#60a5fa');
+addLog('📱 جاهز - حط التوكن و اضغط بدء','#60a5fa');
 </script>
 </body>
 </html>
